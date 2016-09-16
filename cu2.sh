@@ -1,6 +1,7 @@
 #!/bin/bash
 WARN_VALUE=$1
 CRIT_VALUE=$2
+DAYS=0
 if [ "$WARN_VALUE" == "" ] || [ "$CRIT_VALUE" == "" ]
 then
   # if any parameter is missing it will print it out and exit.
@@ -12,16 +13,24 @@ else
   TA=`uptime`
   NUM=`echo $TA | grep -aob 'day' | grep -oE '[0-9]+'`
   DAYS=`echo ${TA:12:NUM} | cut -d " " -f1`
-  if [[ "$DAYS" -lt "$WARN_VALUE" ]]; then
+  if [[ "$DAYS" == "" ]]; then
+    #statements
+    DAYS=0
     echo "OK. Uptime is $DAYS days."
     exit 0
-  fi
-  if [ "$DAYS" -ge "$WARN_VALUE" ] && [ "$DAYS" -le "$CRIT_VALUE" ]; then
-    echo "WARNING! Uptime is $DAYS days."
-    exit 1
-  fi
-  if [[ "$DAYS" -gt "$CRIT_VALUE" ]]; then
-    echo "CRITICAL! Uptime is $DAYS days."
-    exit 2
+  else
+    if [[ "$DAYS" -lt "$WARN_VALUE" ]]; then
+      echo "OK. Uptime is $DAYS days."
+      exit 0
+    fi
+    if [ "$DAYS" -ge "$WARN_VALUE" ] && [ "$DAYS" -le "$CRIT_VALUE" ]; then
+      echo "WARNING! Uptime is $DAYS days."
+      exit 1
+    fi
+    if [[ "$DAYS" -gt "$CRIT_VALUE" ]]; then
+      echo "CRITICAL! Uptime is $DAYS days."
+      exit 2
+    fi
   fi
 fi
+
